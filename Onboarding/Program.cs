@@ -1,10 +1,26 @@
+using System.Net.Http.Headers;
+using Microsoft.EntityFrameworkCore;
+using Onboarding.Data;
+using Onboarding.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 //Add dbcontext
-//builder.Services.AddDbContextFactory<OnboardingDbContext>(options => options.UseSqlite("Data Source=onboarding.db"));
+builder.Services.AddDbContextFactory<OnboardingDbContext>(options => options.UseSqlite("Data Source=onboarding.db"));
+
+// Add services ElsaClient
+var configuration = builder.Configuration;
+
+builder.Services.AddHttpClient<ElsaClient>(httpClient =>
+{
+    var url = configuration["Elsa:ServerUrl"]!.TrimEnd('/') + '/';
+    var apiKey = configuration["Elsa:ApiKey"]!;
+    httpClient.BaseAddress = new Uri(url);
+    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("ApiKey", apiKey);
+});
 
 var app = builder.Build();
 

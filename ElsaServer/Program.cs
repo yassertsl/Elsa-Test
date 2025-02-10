@@ -1,4 +1,3 @@
-using Elsa.EntityFrameworkCore.Extensions;
 using Elsa.EntityFrameworkCore.Modules.Management;
 using Elsa.EntityFrameworkCore.Modules.Runtime;
 using Elsa.Extensions;
@@ -7,10 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddElsa(elsa =>
 {
     // Configure Management layer to use EF Core.
-    elsa.UseWorkflowManagement(management => management.UseEntityFrameworkCore(ef => ef.UseSqlite()));
+    elsa.UseWorkflowManagement(management => management.UseEntityFrameworkCore());
 
     // Configure Runtime layer to use EF Core.
-    elsa.UseWorkflowRuntime(runtime => runtime.UseEntityFrameworkCore(ef => ef.UseSqlite()));
+    elsa.UseWorkflowRuntime(runtime => runtime.UseEntityFrameworkCore());
 
     // Default Identity features for authentication/authorization.
     elsa.UseIdentity(identity =>
@@ -19,20 +18,14 @@ builder.Services.AddElsa(elsa =>
         identity.UseAdminUserProvider();
     });
 
-    //Add Webhooks
-    elsa.UseWebhooks(webhooks =>
-    {
-        //webhooks.WebhookOptions = options =>
-        //{
-        //    builder.Configuration.GetSection("Webhooks").Bind(options);
-        //};
-    });
-
     // Configure ASP.NET authentication/authorization.
     elsa.UseDefaultAuthentication(auth => auth.UseAdminApiKey());
 
     // Expose Elsa API endpoints.
     elsa.UseWorkflowsApi();
+
+    // Setup a SignalR hub for real-time updates from the server.
+    elsa.UseRealTimeWorkflows();
 
     // Enable JavaScript workflow expressions.
     elsa.UseJavaScript();
@@ -54,6 +47,15 @@ builder.Services.AddElsa(elsa =>
 
     // Register custom workflows from the application, if any.
     elsa.AddWorkflowsFrom<Program>();
+
+    // Enable Webhooks.
+    elsa.UseWebhooks(webhooks =>
+    {
+        //webhooks.WebhookOptions = options =>
+        //{
+        //    builder.Configuration.GetSection("Webhooks").Bind(options);
+        //};
+    });
 });
 
 // Configure CORS to allow designer app hosted on a different origin to invoke the APIs.
@@ -72,9 +74,11 @@ var app = builder.Build();
 
 // Configure web application's middleware pipeline.
 app.UseCors();
+app.UseRouting(); // Required for SignalR.
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseWorkflowsApi(); // Use Elsa API endpoints.
 app.UseWorkflows(); // Use Elsa middleware to handle HTTP requests mapped to HTTP Endpoint activities.
+app.UseWorkflowsSignalRHubs(); // Optional SignalR integration. Elsa Studio uses SignalR to receive real-time updates from the server.
 
 app.Run();

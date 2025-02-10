@@ -1,32 +1,48 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Onboarding.Data;
 using Onboarding.Models;
+using Onboarding.Services;
+using Onboarding.Views.Home;
 
-namespace Onboarding.Controllers
+namespace Onboarding.Controllers;
+
+public class HomeController(OnboardingDbContext dbContext, ElsaClient elsaClient, ILogger<HomeController> logger) : Controller
 {
-    public class HomeController : Controller
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        private readonly ILogger<HomeController> _logger;
+        var tasks = await dbContext.Tasks.Where(x => !x.IsCompleted).ToListAsync(cancellationToken: cancellationToken);
+        var model = new IndexViewModel(tasks);
+        return View(model);
+    }
 
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
+    public async Task<IActionResult> CompleteTask(int taskId, CancellationToken cancellationToken)
+    {
+        var task = dbContext.Tasks.FirstOrDefault(x => x.Id == taskId);
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        if (task == null)
+            return NotFound();
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        await elsaClient.ReportTaskCompletedAsync(task.ExternalId, cancellationToken: cancellationToken);
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        task.IsCompleted = true;
+        task.CompletedAt = DateTimeOffset.Now;
+
+        dbContext.Tasks.Update(task);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return RedirectToAction("Index");
+    }
+
+    public IActionResult Privacy()
+    {
+        return View();
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
