@@ -4,7 +4,7 @@ using Elsa.Workflows.Activities;
 using Elsa.Workflows.Runtime.Activities;
 using Parallel = Elsa.Workflows.Activities.Parallel;
 
-namespace ElsaServer.Workflows;
+namespace Elsa.Api.Workflows;
 
 public class Onboarding : WorkflowBase
 {

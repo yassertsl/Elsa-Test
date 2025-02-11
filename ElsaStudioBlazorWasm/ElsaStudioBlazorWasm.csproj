@@ -8,12 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Elsa.Api.Client" Version="3.3.2" />
+    <PackageReference Include="Elsa.Api.Client" Version="3.3.3" />
     <PackageReference Include="Elsa.Studio" Version="3.3.2" />
     <PackageReference Include="Elsa.Studio.Core.BlazorWasm" Version="3.3.2" />
     <PackageReference Include="Elsa.Studio.Login.BlazorWasm" Version="3.3.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.2" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
