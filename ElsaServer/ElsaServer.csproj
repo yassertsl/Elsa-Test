@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <PackageReference Include="Carter" Version="9.0.0" />
 	  <PackageReference Include="Elsa" Version="3.3.3" />
 	  <PackageReference Include="Elsa.CSharp" Version="3.3.3" />
 	  <PackageReference Include="Elsa.EntityFrameworkCore" Version="3.3.3" />
@@ -17,6 +18,8 @@
 	  <PackageReference Include="Elsa.Scheduling" Version="3.3.3" />
 	  <PackageReference Include="Elsa.Webhooks" Version="3.3.3" />
 	  <PackageReference Include="Elsa.Workflows.Api" Version="3.3.3" />
+	  <PackageReference Include="Elsa.Workflows.Management" Version="3.3.3" />
+	  <PackageReference Include="Elsa.Workflows.Runtime" Version="3.3.3" />
   </ItemGroup>
 
 </Project>
