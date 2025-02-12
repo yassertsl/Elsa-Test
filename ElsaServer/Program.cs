@@ -4,6 +4,7 @@ using Elsa.EntityFrameworkCore.Modules.Management;
 using Elsa.EntityFrameworkCore.Modules.Runtime;
 using Elsa.Extensions;
 using Elsa.Identity.Providers;
+using Elsa.Workflows;
 using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Runtime;
@@ -88,46 +89,69 @@ app.UseWorkflowsApi(); // Use Elsa API endpoints.
 app.UseWorkflows(); // Use Elsa middleware to handle HTTP requests mapped to HTTP Endpoint activities.
 
 
-
-
-
 app.MapPost("/resume", async (
     [FromServices] IWorkflowDispatcher dispatcher,
     [FromServices] IWorkflowInstanceStore instanceStore,
+    [FromServices] ILogger<Program> logger,
     [FromBody] ResumeWorkflowRequest request) =>
 {
-    // Validate workflow instance
-    var instance = await instanceStore.FindAsync(new WorkflowInstanceFilter { Id = request.WorkflowInstanceId });
-    if (instance == null)
-        return Results.NotFound("Workflow instance not found");
-
-    // Validate bookmark
-    var bookmark = instance.WorkflowState.Bookmarks.FirstOrDefault(b => b.Id == request.BookmarkId);
-    if (bookmark == null)
-        return Results.NotFound("Bookmark not found or already consumed");
-
-    // Validate ActivityTypeName
-    if (string.IsNullOrEmpty(bookmark.ActivityId))
-        return Results.BadRequest("ActivityTypeName is required but missing.");
-
-    // Dispatch trigger request
-    var dispatchRequest = new DispatchTriggerWorkflowsRequest(
-        activityTypeName: bookmark.ActivityId,  // FIX: Required ActivityTypeName
-        bookmarkPayload: request.BookmarkId
-    )
+    try
     {
-        WorkflowInstanceId = request.WorkflowInstanceId,
-        ActivityInstanceId = bookmark.ActivityInstanceId,
-        Input = request.Input
-    };
+        // Validate workflow instance
+        var instance = await instanceStore.FindAsync(new WorkflowInstanceFilter { Id = request.WorkflowInstanceId });
+        if (instance == null)
+            return Results.NotFound("Workflow instance not found");
 
-    var result = await dispatcher.DispatchAsync(dispatchRequest);
+        // Validate bookmark
+        var bookmark = instance.WorkflowState.Bookmarks.FirstOrDefault(b => b.Id == request.BookmarkId);
+        if (bookmark == null)
+            return Results.NotFound("Bookmark not found or already consumed");
 
-    // Confirm workflow resumed
-    if (result.Succeeded)
-        return Results.Ok(new { Status = "Triggered Successfully" });
+        logger.LogInformation(
+            "Found bookmark {BookmarkName} with ID {BookmarkId}",
+            bookmark.Name,
+            bookmark.Id);
 
-    return Results.BadRequest("Failed to trigger workflow.");
+        // For this specific activity type (EsperarRespuesta), we need to format the input correctly
+        // The input should be the string value for "Nombre del usuario"
+        var dispatchRequest = new DispatchTriggerWorkflowsRequest(
+            "EsperarRespuesta",  // Use the bookmark name as the activity type
+            request.Input)
+        {
+            WorkflowInstanceId = request.WorkflowInstanceId,
+            ActivityInstanceId = bookmark.ActivityInstanceId
+        };
+
+        logger.LogInformation(
+            "Dispatching trigger for workflow {Id} with input {Input}",
+            request.WorkflowInstanceId,
+            System.Text.Json.JsonSerializer.Serialize(request.Input));
+
+        var result = await dispatcher.DispatchAsync(dispatchRequest);
+
+        if (result.Succeeded)
+        {
+            logger.LogInformation(
+                "Successfully triggered workflow {Id}",
+                request.WorkflowInstanceId);
+            return Results.Ok(new
+            {
+                Status = "Triggered Successfully",
+                WorkflowInstanceId = request.WorkflowInstanceId,
+                BookmarkId = request.BookmarkId
+            });
+        }
+
+        logger.LogError(
+            "Failed to trigger workflow {Id}",
+            request.WorkflowInstanceId);
+        return Results.BadRequest("Failed to trigger workflow.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error processing workflow resume request");
+        return Results.BadRequest(new { Error = ex.Message, Details = ex.ToString() });
+    }
 });
 
 
