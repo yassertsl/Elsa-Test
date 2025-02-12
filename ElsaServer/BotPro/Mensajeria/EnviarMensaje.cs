@@ -10,7 +10,7 @@ using System.ComponentModel;
 namespace ElsaServer.BotPro.Mensajeria;
 
 [FlowNode(CONTINUAR)]
-[Category("BOTPRO MENSAJES")]
+[Category(" BOTPRO MENSAJES")]
 public class EnviarMensaje : Activity
 {
     private const string CONTINUAR = "Continuar";
