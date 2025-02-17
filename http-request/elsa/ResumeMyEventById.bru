@@ -1,0 +1,16 @@
+meta {
+  name: ResumeMyEventById
+  type: http
+  seq: 8
+}
+
+get {
+  url: https://localhost:5001/api/MyEvent/ResumeById/instanceId=9eccc4e63ddadeb3
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: ApiKey 00000000-0000-0000-0000-000000000000
+}

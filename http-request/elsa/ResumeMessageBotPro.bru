@@ -1,0 +1,23 @@
+meta {
+  name: ResumeMessageBotPro
+  type: http
+  seq: 5
+}
+
+post {
+  url: https://localhost:5001/api/MensajeRespuesta
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "WorkflowInstanceId":"61e1a0e89758fa06",
+    "BookmarkId":"36ad79b40b0b778",
+    "ActivityId":"d4d3b3fd7ecc991f",
+    "Input" : {
+        "answer": "Geo",
+        "NombreUsuario": "Si"
+      }
+  }
+}

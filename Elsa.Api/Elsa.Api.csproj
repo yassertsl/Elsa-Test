@@ -14,9 +14,12 @@
     <PackageReference Include="Elsa.Identity" Version="3.3.3" />
     <PackageReference Include="Elsa.JavaScript" Version="3.3.3" />
     <PackageReference Include="Elsa.Liquid" Version="3.3.3" />
+    <PackageReference Include="Elsa.MassTransit" Version="3.3.3" />
     <PackageReference Include="Elsa.Scheduling" Version="3.3.3" />
+    <PackageReference Include="Elsa.Tenants" Version="3.3.3" />
     <PackageReference Include="Elsa.Webhooks" Version="3.3.3" />
     <PackageReference Include="Elsa.Workflows.Api" Version="3.3.3" />
+    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
   </ItemGroup>
 
 </Project>

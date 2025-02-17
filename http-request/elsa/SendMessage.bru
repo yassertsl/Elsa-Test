@@ -1,0 +1,25 @@
+meta {
+  name: SendMessage
+  type: http
+  seq: 3
+}
+
+post {
+  url: https://localhost:7102/elsa/api/workflow-definitions/46a8dcf450ab225/execute
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: ApiKey 00000000-0000-0000-0000-000000000000
+}
+
+body:json {
+  {
+    "Input" : {
+              "answer": "si",
+              "NombreUsuario": "Geo"
+      }
+  }
+}

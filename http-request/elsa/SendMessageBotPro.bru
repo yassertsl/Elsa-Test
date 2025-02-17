@@ -1,0 +1,27 @@
+meta {
+  name: SendMessageBotPro
+  type: http
+  seq: 4
+}
+
+post {
+  url: https://localhost:5001/elsa/api/workflow-definitions/46a8dcf450ab225/execute
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: ApiKey 00000000-0000-0000-0000-000000000000
+}
+
+body:json {
+  {
+    "input": {
+      "UserId": "18297501288",
+      "UserName" : "Geo",
+      "ConversationId" : "8774b588-04bc-40d6-a3bb-a8111901e5dd",
+      "Channel" : 4
+    }
+  }
+}
