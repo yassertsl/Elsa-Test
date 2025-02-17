@@ -3,6 +3,7 @@ using Elsa.Workflows;
 using Elsa.Workflows.Activities.Flowchart.Attributes;
 using Elsa.Workflows.Attributes;
 using Elsa.Workflows.Memory;
+using Elsa.Workflows.Models;
 using Elsa.Workflows.UIHints;
 using System.ComponentModel;
 
@@ -17,8 +18,8 @@ public class ManejarRespuestaSi_o_No : Activity
     const string NO = "NO";
     const string OTRA_COSA = "OTRA COSA";
 
-    [Input(UIHint = InputUIHints.VariablePicker, DisplayName = "Variable respuesta", Description = "Escoja la variable donde será guardada la respues del usuario!")]
-    public Variable ContenidoRespuesta { get; set; }
+    [Input(UIHint = InputUIHints.VariablePicker, DisplayName = "Variable respuesta", Description = "Seleccione la variable donde será guardada la respuesta del usuario!")]
+    public required Variable<string> ContenidoRespuesta { get; set; } 
 
     protected override async ValueTask ExecuteAsync(ActivityExecutionContext context)
     {
@@ -26,7 +27,10 @@ public class ManejarRespuestaSi_o_No : Activity
 
         if (ContenidoRespuesta != null)
         {
-            var valor = context.GetVariable<string>(ContenidoRespuesta.Name) + "";
+            var variableName = ContenidoRespuesta?.Name ?? "RespuestaUsuario";
+            var valor = context.GetVariable<string>(variableName) ?? "";
+
+            //var valor = context.GetVariable<string>(ContenidoRespuesta.Name ?? "RespuestaUsuario") ?? "";
             if (string.IsNullOrEmpty(valor))
             {
                 Console.WriteLine($"\n\n\n\n VALOR DE LA VARIABLE ES NULO \n\n\n\n");

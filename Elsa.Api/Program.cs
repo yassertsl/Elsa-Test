@@ -69,17 +69,18 @@ builder.Services.AddElsa(elsa =>
     //    massTransit.AddMessageType<OrderCreated>();
     //};
 
-    elsa.UseTenants(tenants =>
-    {
-        tenants.ConfigureMultitenancy(options =>
-        {
-            // Configure the tenant resolution pipeline.
-            options.TenantResolverPipelineBuilder.Append<ClaimsTenantResolver>();
-        });
 
-        // Install the configuration-based tenanta provider.
-        tenants.UseConfigurationBasedTenantsProvider(options => configuration.GetSection("Multitenancy").Bind(options));
-    });
+    elsa.UseTenants(tenants =>
+        {
+            tenants.ConfigureMultitenancy(options =>
+            {
+                // Configure the tenant resolution pipeline.
+                options.TenantResolverPipelineBuilder.Append<ClaimsTenantResolver>();
+            });
+
+            // Install the configuration-based tenanta provider.
+            tenants.UseConfigurationBasedTenantsProvider(options => configuration.GetSection("Multitenancy").Bind(options));
+        });
 });
 
 // Configure CORS to allow designer app hosted on a different origin to invoke the APIs.

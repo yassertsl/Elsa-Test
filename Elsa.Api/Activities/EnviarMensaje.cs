@@ -1,14 +1,13 @@
-﻿using Elsa.Extensions;
+﻿using System.ComponentModel;
+using System.Threading;
+using Elsa.Extensions;
 using Elsa.Workflows;
-using Elsa.Workflows.Activities;
 using Elsa.Workflows.Activities.Flowchart.Attributes;
 using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Management.Models;
+using Elsa.Workflows.Management;
 using Elsa.Workflows.Memory;
 using Elsa.Workflows.Models;
 using Elsa.Workflows.UIHints;
-using System.ComponentModel;
-using System.Threading;
 
 namespace Elsa.Api.Activities;
 
@@ -16,6 +15,7 @@ namespace Elsa.Api.Activities;
 [Category(" BOTPRO MENSAJES")]
 public class EnviarMensaje : Activity
 {
+    
     private const string CONTINUAR = "Continuar";
 
     [Input(UIHint = InputUIHints.MultiLine, DisplayName = "Contenido del mensaje", Description = "Aquí va el contenido del mensaje!")]
@@ -25,7 +25,7 @@ public class EnviarMensaje : Activity
     public bool EsperarRespuesta { get; set; }
 
     [Input(UIHint = InputUIHints.VariablePicker, DisplayName = "Variable respuesta", Description = "Escoja la variable donde será guardada la respuesta del usuario!")]
-    public Variable<string> ContenidoRespuesta { get; set; }
+    public required Variable<string> ContenidoRespuesta { get; set; }
 
     protected override async ValueTask ExecuteAsync(ActivityExecutionContext context)
     {
@@ -70,7 +70,12 @@ public class EnviarMensaje : Activity
             Console.WriteLine($"\n\n\nReceived answer: {answer}\n\n\n");
 
             // Store the answer in the workflow variable
-            context.SetVariable(ContenidoRespuesta.Name, answer);
+            var variableName = ContenidoRespuesta?.Name ?? "RespuestaUsuario";
+            context.SetVariable(variableName, answer);
+            
+            // Debug: Verificar si se guardó correctamente
+            var valorGuardado = context.GetVariable<string>(variableName);
+            Console.WriteLine($"\n🔍 Debug - Se guardó la variable [{variableName}] con valor: {valorGuardado}");
         }
         else
         {
